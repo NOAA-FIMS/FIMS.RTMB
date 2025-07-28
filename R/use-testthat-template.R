@@ -42,7 +42,7 @@
 #' \dontrun{
 #' FIMS:::use_testthat_template("new_function")
 #' }
-#' 
+#'
 #' @keywords developer
 use_testthat_template <- function(name) {
   # TODO: add the ability to add a function to a file that already exists

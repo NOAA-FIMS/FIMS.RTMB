@@ -55,11 +55,26 @@ test_that("use_gtest_template() works with correct inputs", {
   ))
   #' @description Test that use_gtest_template() creates the correct test file.
   expect_true(file.exists(file.path(
-      temp_path, "tests", "gtest", "test_FIMSMath_ClassName_Logistic.cpp"
+    temp_path, "tests", "gtest", "test_FIMSMath_ClassName_Logistic.cpp"
   )))
 
   #' @description Test that use_gtest_template() creates the correct CMake file.
   expect_true(file.exists(file.path(temp_path, cmakelist_path)))
+
+  # TODO: Make this test live by fixing the grepl statement
+  # suppressMessages(FIMS:::use_gtest_template(
+  #   name = "FIMSMath_ClassName_FunctionName"
+  # ))
+  # #' @description Test that use_gtest_template() appends the correct lines to
+  # #' CMakeLists.txt when an additional test is added rather than writing over
+  # #' it. Not sure if this will work yet. Could also test above for correct lines
+  # #' with the first test.
+  # exepct_true(
+  #   grepl(
+  #     "test_FIMSMath_ClassName_FunctionName.cpp",
+  #     readLines(file.path(temp_path, cmakelist_path))
+  #   )
+  # )
 })
 
 ## Edge handling ----
@@ -69,12 +84,12 @@ test_that("use_gtest_template() handles edge cases correctly", {
     object = FIMS:::use_gtest_template(
       name = "ClassName_FunctionName"
     ),
-    regexp = "Invalid 'name' format"
+    regexp = "Invalid `name` format"
   )
 })
 
 ## Error handling ----
-test_that("use_gtest_template() throws an error if the test file already exists", {
+test_that("use_gtest_template() returns correct error messages", {
   #' @description Test that use_gtest_template() throws an error when the file
   #' already exists.
   error <- tryCatch(
@@ -87,6 +102,23 @@ test_that("use_gtest_template() throws an error if the test file already exists"
     }
   )
   expect_equal(error, "An error occurred.")
+
+  file.rename(
+    from = file.path(temp_path, cmakelist_path),
+    to = file.path(temp_path, "tests", "gtest", "renamed.txt")
+  )
+  #' @description Test that use_gtest_template() throws an error if the
+  #' CMakeLists file does not already exist.
+  expect_error(
+    object = suppressMessages(FIMS:::use_gtest_template(
+      name = "FIMSMath_ClassName_FunctionName"
+    ))
+    # TODO: Add the reguluar expression to the error message
+  )
+  file.rename(
+    from = file.path(temp_path, "tests", "gtest", "renamed.txt"),
+    to = file.path(temp_path, cmakelist_path)
+  )
 })
 
 
@@ -122,7 +154,7 @@ test_that("use_testthat_template() handles edge cases correctly", {
 })
 
 ## Error handling ----
-test_that("use_testthat_template() throws an error if the file already exists", {
+test_that("use_testthat_template() returns correct error messages", {
   # Attempt to use the test template again inside a tryCatch to capture any
   # potential errors
   error <- tryCatch(FIMS:::use_testthat_template("individual_function"),

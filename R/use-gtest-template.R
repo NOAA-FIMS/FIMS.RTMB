@@ -1,16 +1,15 @@
 #' Create tests/gtest/test_*.cpp test file and register it in CMakeLists.txt
 #'
-#' This helper function generate a GoogleTest (gtest) C++ template file for a
-#' given function and appends test registration lines to a
-#' `CMakeLists.txt` file.
+#' This helper function generates a GoogleTest (gtest) C++ template file for a
+#' given function and appends lines to `CMakeLists.txt` to register the test.
 #'
-#' @param name A string representing the combined name for the C++ test file and
-#'   CMake executable target. It must follow the format `FileName_ClassName_FunctionName`,
-#'   where:
+#' @param name A string representing the combined name for the C++ test file
+#'   and CMake executable target. It must follow the format
+#'   `FileName_ClassName_FunctionName`, where
 #'   - `FileName` is the C++ source file name (e.g., "Logistic")
 #'   - `ClassName` is the C++ class name (e.g., "LogisticSelectivity")
 #'   - `FunctionName` is the C++ function name (e.g., "Evaluate")
-#'   Use underscores to separate each component. For example:
+#'   and use underscores to separate each component. For example:
 #'   `Logistic_LogisticSelectivity_Evaluate`.
 #'
 #'   If the function is not a member of a class, use a placeholder for
@@ -26,18 +25,17 @@
 #' Three messages are also returned from the usethis package, which is used by
 #' this function. The first states where the FIMS project is on your computer.
 #' The second states the file path of the newly created file. The file will not
-#' be automatically opened. The third states the test has been registered in 
+#' be automatically opened. The third states the test has been registered in
 #' `tests/gtest/CMakeLists.txt`.
 #'
 #' @examples
 #' \dontrun{
-#' # Create a new test file named "test_Logistic_LogisticSelectivity_Evaluate.cpp"
-#' # for `LogisticSelectivity::evaluate()` in the 
+#' # Create a new test file named
+#' # "test_Logistic_LogisticSelectivity_Evaluate.cpp" for
+#' # `LogisticSelectivity::evaluate()` in
 #' # `inst/include/population_dynamics/selectivity/functors/logistic.hpp`.
-#' 
-#' FIMS:::use_gtest_template(
-#'   name = "Logistic_LogisticSelectivity_Evaluate"
-#' )
+#'
+#' FIMS:::use_gtest_template(name = "Logistic_LogisticSelectivity_Evaluate")
 #' }
 #'
 #' @keywords developer
@@ -46,20 +44,22 @@ use_gtest_template <- function(name = "FileName_ClassName_FunctionName") {
   # TODO: add the ability to also pass the arguments for the function or find
   #       them within the code base and ensure that the template includes the
   #       necessary structure for each input argument
+  # TODO: Change the paste calls to use glue::glue() to increase readability
 
   # Validate the name format
-  name_parts_list <- strsplit(name, "_")[[1]]
+  name_parts_list <- strsplit(x = name, split = "_")[[1]]
   if (length(name_parts_list) != 3) {
     cli::cli_abort(
-      c("Invalid 'name' format.",
-        "i" = "Expected format: 'FileName_ClassName_FunctionName'.",
-        "x" = "Received name: '{name}'.")
+      c("Invalid {.var name} format.",
+        "i" = "Expected format: {.val FileName_ClassName_FunctionName}.",
+        "x" = "Received name: {.val {name}}."
+      )
     )
   }
   # Extract parts from the name
-  file_name <- strsplit(name, "_")[[1]][1]
-  class_name <- strsplit(name, "_")[[1]][2]
-  function_name <- strsplit(name, "_")[[1]][3]
+  file_name <- name_parts_list[[1]][1]
+  class_name <- name_parts_list[[1]][2]
+  function_name <- name_parts_list[[1]][3]
 
   # Create the test file
   path <- file.path("tests", "gtest", paste0("test_", name, ".cpp"))
@@ -74,14 +74,17 @@ use_gtest_template <- function(name = "FileName_ClassName_FunctionName") {
       package = "FIMS"
     )
   } else {
-    cli::cli_abort("{path} already exists.")
+    cli::cli_abort("{.file {path}} already exists.")
   }
-  
+
   # Register the test in tests/gtest/CMakeLists.txt
   cmakelist_path <- file.path("tests", "gtest", "CMakeLists.txt")
+  # TODO: Move this line to earlier in the function and check that the file
+  # exists so the function errors early and informatively
 
   # Open in append mode
   CON <- file(cmakelist_path, "a")
+  on.exit(close(CON), add = TRUE)
   writeLines(
     c(
       paste0("\n\n# test_", name, ".cpp"),
@@ -96,8 +99,9 @@ use_gtest_template <- function(name = "FileName_ClassName_FunctionName") {
     ),
     CON
   )
-  close(CON)
-  cli::cli_alert_success("Registering test '{name}' in '{cmakelist_path}'.")
- 
+  cli::cli_alert_success(
+    "Registering test {.val {name}} in {.file {cmakelist_path}}."
+  )
+
   invisible(TRUE)
 }

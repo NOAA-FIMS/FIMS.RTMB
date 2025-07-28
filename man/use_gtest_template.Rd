@@ -7,14 +7,14 @@
 use_gtest_template(name = "FileName_ClassName_FunctionName")
 }
 \arguments{
-\item{name}{A string representing the combined name for the C++ test file and
-CMake executable target. It must follow the format \code{FileName_ClassName_FunctionName},
-where:
+\item{name}{A string representing the combined name for the C++ test file
+and CMake executable target. It must follow the format
+\code{FileName_ClassName_FunctionName}, where
 \itemize{
 \item \code{FileName} is the C++ source file name (e.g., "Logistic")
 \item \code{ClassName} is the C++ class name (e.g., "LogisticSelectivity")
 \item \code{FunctionName} is the C++ function name (e.g., "Evaluate")
-Use underscores to separate each component. For example:
+and use underscores to separate each component. For example:
 \code{Logistic_LogisticSelectivity_Evaluate}.
 }
 
@@ -35,19 +35,17 @@ be automatically opened. The third states the test has been registered in
 \code{tests/gtest/CMakeLists.txt}.
 }
 \description{
-This helper function generate a GoogleTest (gtest) C++ template file for a
-given function and appends test registration lines to a
-\code{CMakeLists.txt} file.
+This helper function generates a GoogleTest (gtest) C++ template file for a
+given function and appends lines to \code{CMakeLists.txt} to register the test.
 }
 \examples{
 \dontrun{
-# Create a new test file named "test_Logistic_LogisticSelectivity_Evaluate.cpp"
-# for `LogisticSelectivity::evaluate()` in the 
+# Create a new test file named
+# "test_Logistic_LogisticSelectivity_Evaluate.cpp" for
+# `LogisticSelectivity::evaluate()` in
 # `inst/include/population_dynamics/selectivity/functors/logistic.hpp`.
 
-FIMS:::use_gtest_template(
-  name = "Logistic_LogisticSelectivity_Evaluate"
-)
+FIMS:::use_gtest_template(name = "Logistic_LogisticSelectivity_Evaluate")
 }
 
 }
