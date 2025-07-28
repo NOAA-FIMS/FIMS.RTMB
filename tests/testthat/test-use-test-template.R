@@ -62,19 +62,27 @@ test_that("use_gtest_template() works with correct inputs", {
   expect_true(file.exists(file.path(temp_path, cmakelist_path)))
 
   # TODO: Make this test live by fixing the grepl statement
-  # suppressMessages(FIMS:::use_gtest_template(
-  #   name = "FIMSMath_ClassName_FunctionName"
-  # ))
-  # #' @description Test that use_gtest_template() appends the correct lines to
-  # #' CMakeLists.txt when an additional test is added rather than writing over
-  # #' it. Not sure if this will work yet. Could also test above for correct lines
-  # #' with the first test.
-  # exepct_true(
-  #   grepl(
-  #     "test_FIMSMath_ClassName_FunctionName.cpp",
-  #     readLines(file.path(temp_path, cmakelist_path))
-  #   )
-  # )
+  suppressMessages(FIMS:::use_gtest_template(
+    name = "FIMSMath_ClassName_FunctionName"
+  ))
+  
+  # Search for the expected lines in the CMakeLists.txt file
+  first_entry <- grepl(
+    "test_FIMSMath_ClassName_Logistic.cpp",
+    readLines(file.path(temp_path, cmakelist_path))
+  )
+  second_entry <- grepl(
+    "test_FIMSMath_ClassName_FunctionName.cpp",
+    readLines(file.path(temp_path, cmakelist_path))
+  )
+  #' @description Test that use_gtest_template() appends the correct lines to
+  #' CMakeLists.txt when an additional test is added rather than writing over
+  #' it. 
+  expect_true(any(first_entry))
+  expect_true(any(second_entry))
+  #' @description Test that use_gtest_template() appends the new test after the
+  #' previous test in CMakeLists.txt.
+  expect_gt(which(second_entry)[1], which(first_entry)[1])
 })
 
 ## Edge handling ----
@@ -113,14 +121,12 @@ test_that("use_gtest_template() returns correct error messages", {
     object = suppressMessages(FIMS:::use_gtest_template(
       name = "FIMSMath_ClassName_FunctionName"
     ))
-    # TODO: Add the reguluar expression to the error message
   )
   file.rename(
     from = file.path(temp_path, "tests", "gtest", "renamed.txt"),
     to = file.path(temp_path, cmakelist_path)
   )
 })
-
 
 # use_testthat_template ----
 ## setup ----

@@ -40,6 +40,17 @@
 #'
 #' @keywords developer
 use_gtest_template <- function(name = "FileName_ClassName_FunctionName") {
+  cmakelist_path <- file.path("tests", "gtest", "CMakeLists.txt")
+  # Check if the CMakeLists.txt file exists
+  if (!file.exists(cmakelist_path)) {
+    cli::cli_abort(
+      c("{.file {cmakelist_path}} does not exist.",
+        "i" = "Please ensure that the CMakeLists.txt file is present in the
+        {.file tests/gtest} directory."
+      )
+    )
+  }
+
   # TODO: add the ability to add a function to a file that already exists
   # TODO: add the ability to also pass the arguments for the function or find
   #       them within the code base and ensure that the template includes the
@@ -78,10 +89,6 @@ use_gtest_template <- function(name = "FileName_ClassName_FunctionName") {
   }
 
   # Register the test in tests/gtest/CMakeLists.txt
-  cmakelist_path <- file.path("tests", "gtest", "CMakeLists.txt")
-  # TODO: Move this line to earlier in the function and check that the file
-  # exists so the function errors early and informatively
-
   # Open in append mode
   CON <- file(cmakelist_path, "a")
   on.exit(close(CON), add = TRUE)

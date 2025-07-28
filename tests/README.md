@@ -69,8 +69,8 @@ Run the GoogleTest suite.
 - Run following lines in terminal and use gdb to debug:
 ```bash
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
-cmake --build build --parallel 16
-ctest --test-dir build --parallel 16
+cmake --build build --parallel
+ctest --test-dir build --parallel
 gdb ./build/tests/gtest/population_dynamics_population.exe
 c // to continue without paging
 run // to see which line of code is broken
